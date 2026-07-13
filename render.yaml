@@ -1,0 +1,29 @@
+# Render.com blueprint — deploy AI Gateway sebagai web service.
+# Isi env rahasia (GROQ_API_KEY dll) lewat dashboard Render.
+services:
+  - type: web
+    name: jalinai-gateway
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080
+      - key: DATA_DIR
+        value: /app/data
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: GATEWAY_API_KEYS
+        sync: false
+    disk:
+      name: gateway-data
+      mountPath: /app/data
+      sizeGB: 1
