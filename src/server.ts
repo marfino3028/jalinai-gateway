@@ -5,7 +5,13 @@ import { registerRateLimit } from './plugins/ratelimit.js';
 import { chatRoutes } from './routes/chat.js';
 import { modelRoutes } from './routes/models.js';
 import { healthRoutes } from './routes/health.js';
+import { adminRoutes } from './routes/admin.js';
+import { usageRoutes } from './routes/usage.js';
+import { billingRoutes } from './routes/billing.js';
 import { enabledProviderIds } from './providers/registry.js';
+import { initKeystore } from './store/keystore.js';
+import { initUsage } from './store/usage.js';
+import { initOrders } from './store/orders.js';
 
 async function main() {
   const app = Fastify({
@@ -22,9 +28,17 @@ async function main() {
   await app.register(cors, { origin: true });
   await registerRateLimit(app);
 
+  // Init store persisten (Fase 4) sebelum menerima request.
+  await initKeystore();
+  await initUsage();
+  await initOrders();
+
   await app.register(healthRoutes);
   await app.register(chatRoutes);
   await app.register(modelRoutes);
+  await app.register(usageRoutes);
+  await app.register(adminRoutes);
+  await app.register(billingRoutes);
 
   const active = enabledProviderIds();
   if (active.length === 0) {
